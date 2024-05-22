@@ -1,0 +1,123 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+const int GRID_SIZE = 10;
+
+void printGrid(const vector<string>& grid) {
+    for (int i = 0; i < GRID_SIZE; ++i) {
+        cout << grid[i] << endl;
+    }
+}
+
+bool canPlaceWord(const vector<string>& grid, int row, int col, string word, int direction) {
+    int len = word.length();
+    if (direction == 0) { // Horizontal
+        if (col + len > GRID_SIZE) return false;
+        for (int i = 0; i < len; ++i) {
+            if (grid[row][col + i] == '-' || grid[row][col + i] == word[i]) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+    } else { // Vertical
+        if (row + len > GRID_SIZE) return false;
+        for (int i = 0; i < len; ++i) {
+            if (grid[row + i][col] == '-' || grid[row + i][col] == word[i]) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void placeWord(vector<string>& grid, int row, int col, string word, int direction) {
+    int len = word.length();
+    if (direction == 0) { // Horizontal
+        for (int i = 0; i < len; ++i) {
+            grid[row][col + i] = word[i];
+        }
+    } else { // Vertical
+        for (int i = 0; i < len; ++i) {
+            grid[row + i][col] = word[i];
+        }
+    }
+}
+
+void removeWord(vector<string>& grid, int row, int col, string word, int direction) {
+    int len = word.length();
+    if (direction == 0) { // Horizontal
+        for (int i = 0; i < len; ++i) {
+            grid[row][col + i] = '-';
+        }
+    } else { // Vertical
+        for (int i = 0; i < len; ++i) {
+            grid[row + i][col] = '-';
+        }
+    }
+}
+
+bool crosswordSolver(vector<string>& grid, vector<string>& words, int index) {
+    if (index >= words.size()) {
+        // All words placed successfully
+        return true;
+    }
+    
+    string word = words[index];
+    int len = word.length();
+    
+    for (int i = 0; i < GRID_SIZE; ++i) {
+        for (int j = 0; j < GRID_SIZE; ++j) {
+            if (grid[i][j] == '-' || grid[i][j] == word[0]) {
+                if (canPlaceWord(grid, i, j, word, 0)) {
+                    placeWord(grid, i, j, word, 0);
+                    if (crosswordSolver(grid, words, index + 1)) {
+                        return true;
+                    }
+                    removeWord(grid, i, j, word, 0);
+                }
+                
+                if (canPlaceWord(grid, i, j, word, 1)) {
+                    placeWord(grid, i, j, word, 1);
+                    if (crosswordSolver(grid, words, index + 1)) {
+                        return true;
+                    }
+                    removeWord(grid, i, j, word, 1);
+                }
+            }
+        }
+    }
+    
+    return false;
+}
+
+int main() {
+    vector<string> grid(GRID_SIZE);
+    for (int i = 0; i < GRID_SIZE; ++i) {
+        cin >> grid[i];
+    }
+    
+    string words;
+    cin >> words;
+    
+    vector<string> wordList;
+    string word;
+    for (char c : words) {
+        if (c == ';') {
+            wordList.push_back(word);
+            word = "";
+        } else {
+            word += c;
+        }
+    }
+    wordList.push_back(word); // Adding the last word
+    
+    crosswordSolver(grid, wordList, 0);
+    printGrid(grid);
+    
+    return 0;
+}
