@@ -1,0 +1,29 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+void generateStringsRecursive(const vector<char>& letters, int length, string current, int index) {
+    // Base case: if current string has reached desired length
+    if (index == length) {
+        cout << current << endl;
+        return;
+    }
+
+    // Recursive case: try all characters in the current position
+    for (char letter : letters) {
+        // Append current character to the current string
+        string newCurrent = current + letter;
+        // Recursively generate strings of the desired length
+        generateStringsRecursive(letters, length, newCurrent, index + 1);
+    }
+}
+
+int main() {
+    vector<char> letters = {'a', 'b', 'c', 'd'};
+    int length = 3; //Length of string
+    string current = "";
+    int index = 0;
+    generateStringsRecursive(letters, length, current, index);
+    return 0;
+}
